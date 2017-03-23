@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+type Store struct {
+	storedTimes int64
+	storedRegex string 
+}
+
 func main() {
 	// check # of inputted arguments and which argument
 	if len(os.Args) < 2 || os.Args[1] != "avgtimes" {
@@ -27,17 +32,24 @@ func main() {
 	}
 
 
-	counts := make(map[string][]int, 0)
+	counts := make(map[string][]Store, 0)
 
 	for _, k := range data {
 
+		var tmpStore Store
+
 		if strings.Contains(k["timing"], "ms") {
 			timing, _ := strconv.ParseInt(strings.TrimSuffix(k["timing"], "ms"), 10, 64)
-			counts[k["category"]] = append(counts[k["category"]], int(timing))
+			// counts[k["category"]] = append(counts[k["category"]], int(timing))
+			tmpStore.storedTimes = timing
 		} else if strings.Contains(k["timing"], "s"){
 			timing, _ := strconv.ParseInt(strings.TrimSuffix(k["timing"], "s"), 10, 64)
-			counts[k["category"]] = append(counts[k["category"]], int(timing) * 1e3)
+			// counts[k["category"]] = append(counts[k["category"]], int(timing) * 1e3)
+			tmpStore.storedTimes = timing * 1e3
 		}
+
+		tmpStore.storedRegex = k["regex"]
+		counts[k["category"]] = append(counts[k["category"]], tmpStore)
 		
 		// if err != nil {
 		// 	panic(err.Error())
@@ -49,12 +61,23 @@ func main() {
 	
 	// fmt.Printf(counts)
 
-	for cat, times := range counts {
-		s := 0.0
-		for _, t := range times {
-			s += float64(t)
+	for cat, stores := range counts {
+		accumTimes := 0.0
+		accumRegEx := ""
+
+		for _, t := range stores {
+			// s += float64(t)
+			accumTimes += float64(t.storedTimes)
+			accumRegEx += t.storedRegex + " "
 			// fmt.Println(cat,"--", t)
 		}
-		fmt.Printf("category: %s\tavg %fms\n", cat, s/float64(len(times)))
+		fmt.Printf("category: %s\tavg %fms\t%s \n", cat, accumTimes/float64(len(stores)), accumRegEx)
 	}
 }
+
+
+
+
+
+
+
