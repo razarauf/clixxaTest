@@ -17,9 +17,6 @@ type Store struct {
 const FEATURE_1 = "avgtimes"
 const FEATURE_2 = "requests"
 
-//  count the pairs where A.cat matches B.regex AND B.cat matches A.regex. Group these counts by category.
-// gaming category has 2 housing regex and housing category has 1 gaming regex
-
 func main() {
 	// check # of inputted arguments and which argument
 	if len(os.Args) < 2 || os.Args[1] != FEATURE_1 && os.Args[1] != FEATURE_2 {
@@ -37,7 +34,6 @@ func main() {
 			panic(err.Error())
 		}
 	}
-
 
 	counts := make(map[string][]Store, 0)
 
@@ -65,14 +61,11 @@ func main() {
 		// times
 		for cat, stores := range counts {
 			accumTimes := 0.0
-			// accumRegEx := ""
 
 			for _, t := range stores {
-				// s += float64(t)
 				accumTimes += float64(t.storedTimes)
-				// accumRegEx += t.storedRegex + " "
-				// fmt.Println(cat,"--", t)
 			}
+
 			fmt.Printf("category: %s\t%fms\n", cat, accumTimes/float64(len(stores)))
 		}
 
